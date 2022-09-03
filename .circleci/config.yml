@@ -140,8 +140,6 @@ jobs:
       - checkout
       - install_awscli
       - run:
-          echo "Hello world"
-      - run:
           name: Ensure frontend infrastructure exist
           command: |
             aws cloudformation deploy \
