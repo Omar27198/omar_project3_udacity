@@ -374,14 +374,25 @@ jobs:
       - checkout  
       - install_ansible
       - install_awscli
-      - install_nodejs 
+      - install_nodejs
+      - run:
+          name: Getting OldWorkflowID
+          command: |
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+            echo $OldWorkflowID >> ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt 
       - run:
           name: Update cloudfront distribution
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
-            --stack-name PromotionPhaseCloudfront \
+            --stack-name udapeople-${OldWorkflowID}  \
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Print out WorkflowIDs
+          command: |
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo Current OldWorkflow ID: "${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy-environment
       - revert-migrations  
 
