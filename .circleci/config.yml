@@ -388,7 +388,7 @@ jobs:
       - destroy-environment
       - revert-migrations  
 
-cleanup:
+  cleanup:
     docker:
       - image: cimg/python:3.10 
     steps:
