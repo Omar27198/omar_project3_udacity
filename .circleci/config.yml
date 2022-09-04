@@ -371,9 +371,10 @@ jobs:
     docker:
       - image: cimg/python:3.10 
     steps:
-      - checkout
+      - checkout  
       - install_ansible
       - install_awscli
+      - install_nodejs 
       - run:
           name: Install dependencies Frontend
           command: |
