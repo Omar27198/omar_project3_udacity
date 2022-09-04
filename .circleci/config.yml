@@ -398,15 +398,12 @@ jobs:
     steps:
       - checkout 
       - run:
-          name: Get old stack workflow id
+          name: Get old stack workflow id {AND} Remove old stacks and files
           command: |
             export OldWorkflowID=.circleci/ansible/OldWorkflowID.txt
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
             echo Stack names: "${STACKS[@]}"
-      - run:
-          name: Remove old stacks and files
-          command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
@@ -417,6 +414,6 @@ jobs:
 workflows:
   default:
     jobs:
-      - cloudfront-update
-      #- cleanup:
-       #  requires: [cloudfront-update]
+      #- cloudfront-update
+      - cleanup:
+          requires: [cloudfront-update]
