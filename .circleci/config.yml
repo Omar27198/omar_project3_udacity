@@ -376,13 +376,19 @@ jobs:
       - install_awscli
       - install_nodejs
       - run:
-          name: Update cloudfront distribution
+          name: Getting Old Workflow ID
           command: |
             export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
             echo $OldWorkflowID >> .circleci/ansible/OldWorkflowID.txt
+      - run:
+          name: Update cloudfront distribution
+          command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
             --stack-name udapeople-cloudfront \
+      - run:
+          name: Printout Workflow IDs
+          command: |
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy-environment
@@ -394,12 +400,15 @@ jobs:
     steps:
       - checkout 
       - run:
-          name: Get old stack workflow id {AND} Remove old stacks and files
+          name: Get old stack workflow id
           command: |
             export OldWorkflowID=.circleci/ansible/OldWorkflowID.txt
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-            echo Stack names: "${STACKS[@]}" 
+            echo Stack names: "${STACKS[@]}"
+      - run:
+          name: Remove old stacks and files
+          command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
