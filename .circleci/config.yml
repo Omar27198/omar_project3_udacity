@@ -292,6 +292,8 @@ jobs:
       - install_nodejs  
       - restore_cache:
           keys: [backend-deps]
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
